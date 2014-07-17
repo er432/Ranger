@@ -22,5 +22,6 @@ setup(
     license = release.license,
     platforms = release.platforms,
     url = release.url,
+    test_suite = 'Ranger.test',
     classifiers = release.classifiers
     )
