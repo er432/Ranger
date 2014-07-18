@@ -6,7 +6,6 @@ class Range(object):
     is represented by 2 cutpoints can can be unbounded by specifying an
     aboveAll or belowAll Cut.
     """
-    # TODO: Finish Range.py
     def __init__(self, lowerCut, upperCut):
         """ Instantiates a Range
 
