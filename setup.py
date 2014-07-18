@@ -5,8 +5,8 @@ import sys
 
 sys.path.insert(0,'Ranger')
 import release
-version = release.write_versionfile()
 sys.path.pop(0)
+version = release.write_versionfile()
 packages = ['Ranger',
             'Ranger.src',
             'Ranger.src.Range'
