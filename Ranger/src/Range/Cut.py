@@ -58,6 +58,82 @@ class Cut(object):
         if not isinstance(pt, self.theType):
             raise ValueError("Type is not compatible with cutpoint type")
         return True
+    def __hash__(self):
+        if self.belowAll:
+            return hash(self.theType)*31-hash(None)
+        elif self.aboveAll:
+            return hash(self.theType)*31+hash(None)
+        elif self.below:
+            return hash(self.theType)*31-hash(self.point)
+        else:
+            return hash(self.theType)*31+hash(self.point)
+    def __repr__(self):
+        if self.belowAll:
+            return "Cut(Below all %s)" % str(self.theType)
+        elif self.aboveAll:
+            return "Cut(Above all %s)" % str(self.theType)
+        elif self.below:
+            return "Cut(Below %s)" % str(self.point)
+        else:
+            return "Cut(Above %s)" % str(self.point)
+    def __eq__(self, other):
+        """ Returns whether Cuts are at EXACT same place """
+        if not isinstance(other, Cut):
+            return False
+        elif self.aboveAll:
+            return other.aboveAll
+        elif self.belowAll:
+            return other.belowAll
+        elif (self.point is not None) and (other.point is not None):
+            return ((self.point == other.point) and (self.below == other.below))
+        else:
+            return False
+    def __lt__(self, other):
+        """ Returns whether cutpoint is less than a specified value """
+        if isinstance(other, Cut):
+            if self.belowAll:
+                return True
+            elif self.aboveAll:
+                return False
+            elif other.belowAll:
+                return False
+            elif other.aboveAll:
+                return True
+            else:
+                if self.point < other.point:
+                    return True
+                elif self.point == other.point and self.below and \
+                  not other.below:
+                    return True
+                else:
+                    return False
+        else:
+            return self.isLessThan(other)
+    def __gt__(self, other):
+        """ Returns whether cutpoint is greater than a specified value """
+        if isinstance(other, Cut):
+            if self.belowAll:
+                return False
+            elif self.aboveAll:
+                return True
+            elif other.belowAll:
+                return True
+            elif other.aboveAll:
+                return False
+            else:
+                if self.point > other.point:
+                    return True
+                elif self.point == other.point and not self.below and \
+                  other.below:
+                    return True
+                else:
+                    return False
+        else:
+            return self.isGreaterThan(other)
+    def __ge__(self, other):
+        return (self.__eq__(other) or self.__gt__(other))
+    def __le__(self, other):
+        return (self.__eq__(other) or self.__lt__(other))
     def isLessThan(self, val):
         """ Returns whether the cutpoint is less than a specified value
 

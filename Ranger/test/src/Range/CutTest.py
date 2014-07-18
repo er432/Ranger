@@ -5,6 +5,7 @@ debug = False
 
 class CutTest(unittest.TestCase):
     """ Unit Tests for Cut.py """
+    # TODO: Write unit tests for __eq__, __lt__, __gt__, __le__, __ge__
     def test_isLessThanInt(self):
         if debug: print("Testing isLessThan with integers")
         ptCut = Cut(int, point=2, below=False)
