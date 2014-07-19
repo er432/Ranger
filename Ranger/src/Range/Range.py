@@ -61,8 +61,8 @@ class Range(object):
         -------
         True if the range contains the value
         """
-        return (self.lowerCut.isLessThan(val) and \
-                self.upperCut.isGreaterThan(val))
+        return (self.lowerCut < val and \
+                self.upperCut > val)
     def containsAll(self, vals):
         """ Returns True if the range contains all values in some
         iterable
@@ -303,8 +303,8 @@ class Range(object):
     ##################
     @staticmethod
     def _validate_cutpoints(*pts):
-        if not all(map(lambda x: hasattr(x, "__lt__") and \
-                       hasattr(x, "__gt__"), pts)):
+        if not all(map(lambda x: (hasattr(x, "__lt__") and \
+                hasattr(x, "__gt__")) or hasattr(x,'__cmp__'), pts)):
             raise ValueError("Cutpoint type(s) not comparable")
         if len(pts) == 2:
             if not (issubclass(type(pts[0]),type(pts[1])) or \
