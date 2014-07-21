@@ -55,7 +55,14 @@ class RangeSet(object):
         ValueError
             If adding range of type not compatible with previously
             added ranges
+        TypeError:
+            If not adding a Range
         """
+        if not isinstance(aRange, Range):
+            raise TypeError("aRange is not a Range")
+        elif aRange.isEmpty():
+            # Skip if this is an empty range
+            return
         # Check for compatibility of types if necessary
         if len(self) > 0:
             if not (issubclass(aRange.lowerCut.theType,
