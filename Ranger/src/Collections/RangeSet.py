@@ -316,6 +316,83 @@ class RangeSet(object):
         else:
             lower_ind = bisect_left(self.lower_cuts,val)-1
             return self.ranges[lower_ind].contains(val)
+    def remove(self, aRange):
+        """ Removes a range from the range set. 
+
+        Parameters
+        ----------
+        aRange : A Range object
+            The Range to remove from the RangeSet
+
+        Raises
+        ------
+        ValueError
+            If removing range of type not compatible with previously
+            added ranges
+        TypeError:
+            If not a Range 
+        """
+        if not isinstance(aRange, Range):
+            raise TypeError("aRange is not a Range")
+        elif aRange.isEmpty():
+            # Skip if this is an empty range
+            return
+        # Check for compatibility of types if necessary
+        if len(self) > 0:
+            if not (issubclass(aRange.lowerCut.theType,
+                               self.ranges[0].lowerCut.theType) or \
+                    issubclass(self.ranges[0].lowerCut.theType,
+                               aRange.lowerCut.theType)):
+                raise ValueError("Range not compatible with previously added ranges")
+        # Check if the range actually overlaps with this set
+        if not self.overlaps(aRange):
+            return
+        else:
+            # There's some overlap, so deal with that
+            # Determine where overlap occurs
+            ovlapLowerInd = max(bisect_left(self.lower_cuts, aRange.lowerCut)-1,0)
+            ovlapUpperInd = bisect_left(self.lower_cuts, aRange.upperCut)
+            # Create queue of indices marked for removal
+            removeRanges = deque()
+            # Create queue of ranges to add
+            addRanges = deque()
+            for i in range(ovlapLowerInd, ovlapUpperInd):
+                try:
+                    # Get intersection of the ranges
+                    intersect = aRange.intersection(self.ranges[i])
+                    if not intersect.isEmpty():
+                        if intersect == self.ranges[i]:
+                            # Mark range for removal
+                            removeRanges.append(i)
+                        elif self.lower_cuts[i] == intersect.lowerCut:
+                            # If equal on the left cutpoint, subtract out left
+                            # part
+                            self.lower_cuts[i] = intersect.upperCut
+                            self.ranges[i] = Range(intersect.upperCut, self.upper_cuts[i])
+                        elif self.upper_cuts[i] == intersect.upperCut:
+                            # If equal on right cutpoint, subtract out right
+                            # part
+                            self.upper_cuts[i] = intersect.lowerCut
+                            self.ranges[i] = Range(self.lower_cuts[i], intersect.lowerCut)
+                        else:
+                            # If in the middle, split into two parts, putting both into
+                            # add queue and placing the old range index into the removal
+                            # queue
+                            addRanges.append(Range(self.lower_cuts[i], intersect.lowerCut))
+                            addRanges.append(Range(intersect.upperCut, self.upper_cuts[i]))
+                            removeRanges.append(i)
+                except ValueError:
+                    # Continue if no overlap with this range
+                    continue
+            # Remove any ranges that are marked for removal
+            while len(removeRanges) > 0:
+                removeInd = removeRanges.pop()
+                self.ranges.pop(removeInd)
+                self.lower_cuts.pop(removeInd)
+                self.upper_cuts.pop(removeInd)
+            # Add any ranges that need to be added
+            while len(addRanges) > 0:
+                self.add(addRanges.pop())
     def union(self, otherSet):
         """ Creates a new RangeSet that is the union of this set and
         another RangeSet object

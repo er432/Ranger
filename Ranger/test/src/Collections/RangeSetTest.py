@@ -120,6 +120,36 @@ class RangeSetTest(unittest.TestCase):
         self.assertEqual(intersect, RangeSet([
             Range.openClosed(8,10)
         ]))
+    def test_remove(self):
+        if debug: print("Testing remove")
+        startSet = RangeSet([Range.closed(3,5),Range.closed(7,10)])
+        # Try removing something outside all ranges
+        startSet.remove(Range.closed(0,1))
+        self.assertEqual(startSet, RangeSet([
+            Range.closed(3,5),Range.closed(7,10)
+        ]))
+        # Remove left part of left range
+        startSet.remove(Range.closed(2,3))
+        self.assertEqual(startSet, RangeSet([
+            Range.openClosed(3,5),Range.closed(7,10)
+        ]))
+        # Remove from middle of right range
+        startSet.remove(Range.closed(8,9))
+        self.assertEqual(startSet, RangeSet([
+            Range.openClosed(3,5),Range.closedOpen(7,8),
+            Range.openClosed(9,10)
+        ]))
+        # Remove through both ranges
+        startSet.remove(Range.closed(5,7))
+        self.assertEqual(startSet, RangeSet([
+            Range.open(3,5),Range.open(7,8),
+            Range.openClosed(9,10)
+        ]))
+        # Remove over the whole second set of ranges
+        startSet.remove(Range.closed(5,100))
+        self.assertEqual(startSet, RangeSet([
+            Range.open(3,5)
+        ]))
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)
