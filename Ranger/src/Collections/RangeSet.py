@@ -210,31 +210,75 @@ class RangeSet(object):
                 newUpperCut = addRange.upperCut
                 add = True
                 for i in range(otherLowerInd, otherUpperInd):
-                    # Get the intersection of the ranges
-                    intersect = addRange.intersection(otherSet.ranges[i])
-                    if not intersect.isEmpty():
-                        if addRange == intersect:
-                            add = False
-                            break
-                        elif addRange.lowerCut == intersect.lowerCut:
-                            # If equal on the left cutpoint, subtract out left
-                            # part
-                            newLowerCut = intersect.upperCut
-                        elif addRange.upperCut == intersect.upperCut:
-                            # If equal on right cutpoint, subtract out right
-                            # part
-                            newUpperCut = intersect.lowerCut
-                        else:
-                            # If in the middle, split into two parts and
-                            # add the lower one immediately
-                            newSet.add(Range(addRange.lowerCut,
-                                             intersect.lowerCut))
-                            newLowerCut = intersect.upperCut
-                            newUpperCut = addRange.upperCut
+                    try:
+                        # Get the intersection of the ranges
+                        intersect = addRange.intersection(otherSet.ranges[i])
+                        if not intersect.isEmpty():
+                            if addRange == intersect:
+                                add = False
+                                break
+                            elif addRange.lowerCut == intersect.lowerCut:
+                                # If equal on the left cutpoint, subtract out left
+                                # part
+                                newLowerCut = intersect.upperCut
+                            elif addRange.upperCut == intersect.upperCut:
+                                # If equal on right cutpoint, subtract out right
+                                # part
+                                newUpperCut = intersect.lowerCut
+                            else:
+                                # If in the middle, split into two parts and
+                                # add the lower one immediately
+                                newSet.add(Range(addRange.lowerCut,
+                                                 intersect.lowerCut))
+                                newLowerCut = intersect.upperCut
+                                newUpperCut = addRange.upperCut
+                    except ValueError:
+                        continue
                 if add:
                     newSet.add(Range(newLowerCut, newUpperCut))
             else:
                 newSet.add(addRange)
+        return newSet
+    def intersection(self, otherSet):
+        """ Creates a new RangeSet that is the intersection of this and
+        another RangeSet
+
+        Parameters
+        ----------
+        otherSet : RangeSet object
+            The RangeSet used for this intersection
+
+        Raises
+        ------
+        TypeError
+            If the object passed in is not a RangeSet
+        ValueError
+            If the value type of the ranges in the other set not compatible
+            with the range's values
+
+        Returns
+        -------
+        RangeSet consisting of the intersection of the two sets
+        """
+        if not isinstance(otherSet, RangeSet):
+            raise TypeError("otherSet is not a RangeSet")
+        newSet = RangeSet()
+        for addRange in self.ranges:
+            if otherSet.overlaps(addRange):
+                # Determine where overlap occurs
+                otherLowerInd = max(bisect_left(otherSet.lower_cuts,
+                                                addRange.lowerCut)-1,0)
+                otherUpperInd = bisect_left(otherSet.lower_cuts,
+                                            addRange.upperCut)
+                for i in range(otherLowerInd, otherUpperInd):
+                    # Get the intersection of the ranges
+                    try:
+                        intersect = addRange.intersection(otherSet.ranges[i])
+                        # Add intersection if there is any overlap
+                        if not intersect.isEmpty():
+                            newSet.add(intersect)
+                    except ValueError:
+                        continue
         return newSet
     def overlaps(self, val):
         """ Returns true if any of the ranges at least partially overlap

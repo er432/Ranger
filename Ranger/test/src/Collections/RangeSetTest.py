@@ -103,6 +103,23 @@ class RangeSetTest(unittest.TestCase):
                                    Range.openClosed(9,10)]))
         diffSet = startSet.difference(RangeSet([Range.closed(1,11)]))
         self.assertEqual(len(diffSet),0)
+    def test_intersection(self):
+        if debug: print("Testing intersection")
+        startSet = RangeSet([Range.closed(3,5),Range.closed(7,10)])
+        intersect = startSet.intersection(RangeSet([Range.closed(4,6)]))
+        self.assertEqual(intersect,RangeSet([Range.closed(4,5)]))
+        intersect = startSet.intersection(RangeSet([
+            Range.closed(1,3),Range.closed(8,9),Range.closed(12,15)
+        ]))
+        self.assertEqual(intersect, RangeSet([
+            Range.closed(3,3),Range.closed(8,9)
+        ]))
+        intersect = startSet.intersection(RangeSet([
+            Range.openClosed(8,1000)
+        ]))
+        self.assertEqual(intersect, RangeSet([
+            Range.openClosed(8,10)
+        ]))
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)
