@@ -28,13 +28,13 @@ class Range(object):
         self.lowerCut = lowerCut
         self.upperCut = upperCut
     def __repr__(self):
-        return_str = '[' if self.hasLowerBound() else '('
+        return_str = '[' if self.isLowerBoundClosed() else '('
         return_str += (str(self.lowerCut.point) if not self.lowerCut.belowAll \
           else '')
         return_str += ' , '
         return_str += (str(self.upperCut.point) if not self.upperCut.aboveAll \
           else '')
-        return_str += ']' if self.hasUpperBound() else ')'
+        return_str += ']' if self.isUpperBoundClosed() else ')'
         return return_str
     def __hash__(self):
         return (hash(self.lowerCut)*31 + hash(self.upperCut))
@@ -44,6 +44,8 @@ class Range(object):
         else:
             return ((self.lowerCut == other.lowerCut) and \
                     (self.upperCut == other.upperCut))
+    def __ne__(self, other):
+        return not self.__eq__(other)
     def contains(self, val):
         """ Returns true if the range contains the value
 
@@ -61,8 +63,8 @@ class Range(object):
         -------
         True if the range contains the value
         """
-        return (self.lowerCut.isLessThan(val) and \
-                self.upperCut.isGreaterThan(val))
+        return (self.lowerCut < val and \
+                self.upperCut > val)
     def containsAll(self, vals):
         """ Returns True if the range contains all values in some
         iterable
@@ -196,6 +198,11 @@ class Range(object):
         other : A Range
             The range to compare to
 
+        Raises
+        ------
+        ValueError
+            If object passed in is not a Range
+
         Returns
         -------
         True if the bounds of the other range do not extend outside
@@ -219,6 +226,11 @@ class Range(object):
         other : A range
             The range to compare to
 
+        Raises
+        ------
+        ValueError
+            If object passed in is not a Range
+        
         Returns
         -------
         True if there is a (possibly empty) range that is enclosed by
@@ -303,8 +315,8 @@ class Range(object):
     ##################
     @staticmethod
     def _validate_cutpoints(*pts):
-        if not all(map(lambda x: hasattr(x, "__lt__") and \
-                       hasattr(x, "__gt__"), pts)):
+        if not all(map(lambda x: (hasattr(x, "__lt__") and \
+                hasattr(x, "__gt__")) or hasattr(x,'__cmp__'), pts)):
             raise ValueError("Cutpoint type(s) not comparable")
         if len(pts) == 2:
             if not (issubclass(type(pts[0]),type(pts[1])) or \

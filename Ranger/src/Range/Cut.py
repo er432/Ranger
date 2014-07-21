@@ -76,6 +76,12 @@ class Cut(object):
             return "Cut(Below %s)" % str(self.point)
         else:
             return "Cut(Above %s)" % str(self.point)
+    def __cmp__(self, other):
+        if self == other:
+            return 0
+        elif self < other:
+            return -1
+        elif self > other: return 1
     def __eq__(self, other):
         """ Returns whether Cuts are at EXACT same place """
         if not isinstance(other, Cut):
@@ -88,6 +94,8 @@ class Cut(object):
             return ((self.point == other.point) and (self.below == other.below))
         else:
             return False
+    def __ne__(self, other):
+        return not self.__eq__(other)
     def __lt__(self, other):
         """ Returns whether cutpoint is less than a specified value """
         if isinstance(other, Cut):

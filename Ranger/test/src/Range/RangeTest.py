@@ -14,6 +14,10 @@ class RangeTest(unittest.TestCase):
         self.assertTrue(floatRange.contains(3.))
         self.assertTrue(floatRange.contains(5.))
         self.assertFalse(floatRange.contains(5.01))
+        # Integers
+        intRange = Range.closed(2,5)
+        self.assertTrue(intRange.contains(2))
+        self.assertFalse(intRange.contains(1))
         # Letters
         letterRange = Range.closed('b','e')
         self.assertFalse(letterRange.contains('a'))
