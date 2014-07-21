@@ -94,6 +94,8 @@ class Cut(object):
             return ((self.point == other.point) and (self.below == other.below))
         else:
             return False
+    def __ne__(self, other):
+        return not self.__eq__(other)
     def __lt__(self, other):
         """ Returns whether cutpoint is less than a specified value """
         if isinstance(other, Cut):

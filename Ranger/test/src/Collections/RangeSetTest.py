@@ -49,7 +49,6 @@ class RangeSetTest(unittest.TestCase):
         self.assertEqual(Range.closed(2,12), theSet.ranges[0])
         self.assertEqual(Cut.belowValue(2), theSet.lower_cuts[0])
         self.assertEqual(Cut.aboveValue(12), theSet.upper_cuts[0])
-
     def test_contains(self):
         if debug: print("Testing contains")
         theSet = RangeSet()
@@ -62,6 +61,48 @@ class RangeSetTest(unittest.TestCase):
         self.assertFalse(theSet.contains(Range.closed(1,4)))
         self.assertFalse(theSet.contains(Range.closed(6,6)))
         self.assertFalse(theSet.contains(Range.closed(8,12)))
+    def test_overlaps(self):
+        if debug: print("Testing overlaps")
+        theSet = RangeSet()
+        theSet.add(Range.closed(3,5))
+        theSet.add(Range.closed(7,10))
+        self.assertTrue(theSet.overlaps(4))
+        self.assertFalse(theSet.overlaps(2))
+        self.assertTrue(theSet.overlaps(3))
+        self.assertTrue(theSet.overlaps(10))
+        self.assertTrue(theSet.overlaps(Range.closed(4,5)))
+        self.assertTrue(theSet.overlaps(Range.closed(8,9)))
+        self.assertTrue(theSet.overlaps(Range.closed(1,4)))
+        self.assertFalse(theSet.overlaps(Range.closed(6,6)))
+        self.assertTrue(theSet.overlaps(Range.closed(8,12)))
+        self.assertTrue(theSet.overlaps(Range.closed(1,12)))
+    def test_union(self):
+        if debug: print("Testing union")
+        firstSet = RangeSet([Range.closed(3,5), Range.closed(7,10)])
+        secondSet = RangeSet([Range.closed(2,4), Range.closed(5, 11),
+                              Range.closed(13, 15)])
+        union = firstSet.union(secondSet)
+        self.assertEqual(union, RangeSet([Range.closed(2,11),
+                                          Range.closed(13,15)]))
+    def test_difference(self):
+        if debug: print("Testing difference")
+        startSet = RangeSet([Range.closed(3,5),Range.closed(7,10)])
+        diffSet = startSet.difference(RangeSet([Range.closed(4,6)]))
+        self.assertEqual(diffSet,
+                         RangeSet([Range.closedOpen(3,4),
+                                   Range.closed(7,10)]))
+        diffSet = startSet.difference(RangeSet([Range.closed(2,6)]))
+        self.assertEqual(diffSet,
+                         RangeSet([Range.closed(7,10)]))
+        diffSet = startSet.difference(RangeSet([Range.closed(-2,1)]))
+        self.assertEqual(diffSet, startSet)
+        diffSet = startSet.difference(RangeSet([Range.closed(1,3),
+                                                Range.closed(6,9)]))
+        self.assertEqual(diffSet,
+                         RangeSet([Range.openClosed(3,5),
+                                   Range.openClosed(9,10)]))
+        diffSet = startSet.difference(RangeSet([Range.closed(1,11)]))
+        self.assertEqual(len(diffSet),0)
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)
