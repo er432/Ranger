@@ -174,6 +174,7 @@ class RangeSet(object):
         -------
         true if any of the ranges fully enclose the given value
         """
+        if len(self) == 0: return False
         # Get the index+1 of the highest lower cut <= to the value or its
         # lower cutpoint and check if the value contained
         if isinstance(val, Range):
@@ -304,6 +305,7 @@ class RangeSet(object):
         -------
         true if any of the ranges fully enclose the given value
         """
+        if len(self) == 0: return False
         # Get the index+1 of the highest lower cut <= to the value or its
         # lower cutpoint and check if the value overlaps
         if isinstance(val, Range):
@@ -311,7 +313,8 @@ class RangeSet(object):
             upper_ind = bisect_left(self.lower_cuts, val.upperCut)
             for i in range(lower_ind,upper_ind):
                 if val.isConnected(self.ranges[i]):
-                    return True
+                    if not self.ranges[i].intersection(val).isEmpty():
+                        return True
             return False
         else:
             lower_ind = bisect_left(self.lower_cuts,val)-1
@@ -329,7 +332,7 @@ class RangeSet(object):
         ValueError
             If removing range of type not compatible with previously
             added ranges
-        TypeError:
+        TypeError
             If not a Range 
         """
         if not isinstance(aRange, Range):
