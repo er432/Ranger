@@ -27,6 +27,12 @@ class RangeMap(object):
         if rangeDict is not None:
             for rangeKey, val in rangeDict.iteritems():
                 self.set(rangeKey, val)
+    def __getitem__(self, key):
+        return self.get(key)
+    def __setitem__(self, key, value):
+        self.put(key, value)
+    def __delitem__(self, key):
+        self.remove(key)
     def __eq__(self, other):
         if not isinstance(other, RangeMap): return False
         elif len(self) != len(other): return False
@@ -44,6 +50,8 @@ class RangeMap(object):
             "%s : %s" % (k,v) for k,v in zip(self.ranges, self.items)
             ])
         return returnStr
+    def __missing__(self, key):
+        raise KeyError(str(key))
     def contains(self, val):
         """ Returns true if any of the ranges fully enclose the given
         value, which can be a single value or a Range object
@@ -70,6 +78,53 @@ class RangeMap(object):
         else:
             lower_ind = max(bisect_left(self.lower_cuts, val)-1,0)
             return self.ranges[lower_ind].contains(val)
+    def get(self, key):
+        """ Get the item(s) corresponding to a given key. The key can be a
+        Range or a single value that is within a Range
+
+        Parameters
+        ----------
+        key : A single value or Range object
+
+        Raises
+        ------
+        KeyError
+            If there is no overlap with the key
+        ValueError
+            If the key type not compatible with the ranges
+        
+        Returns
+        -------
+        A set containing all overlapping items
+        """
+        if not self.overlaps(key):
+            self.__missing__(key)
+        elif isinstance(key, Range):
+            # If this is a single value
+            returnSet = set()
+            # Get the bounding indices
+            ovlapLowerInd = max(bisect_left(self.lower_cuts, key.lowerCut)-1,0)
+            ovlapUpperInd = bisect_left(self.lower_cuts, key.upperCut)
+            for i in range(ovlapLowerInd, ovlapUpperInd):
+                try:
+                    # Get intersection of the ranges
+                    intersect = key.intersection(self.ranges[i])
+                    if not intersect.isEmpty():
+                        # If overlapping with this range, put its
+                        # item in the return set
+                        returnSet.add(self.items[i])
+                except ValueError:
+                    # Continue if no overlap with this range
+                    continue
+            # Return the set of items
+            return returnSet
+        else:
+            # If this is a single value
+            # Get the index of the range containing the value
+            lower_ind = max(bisect_left(self.lower_cuts, key)-1,0)
+            # Return the item at that value
+            return set([self.items[lower_ind]])
+            
     def overlaps(self, val):
         """ Returns true if any of the ranges at least partially overlap
         the given value, which can be a single value or a Range object

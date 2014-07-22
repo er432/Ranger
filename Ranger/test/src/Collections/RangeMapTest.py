@@ -76,7 +76,22 @@ class RangeMapTest(unittest.TestCase):
         self.assertEqual(rangeMap.ranges[2], Range.open(11,20))
         self.assertEqual(rangeMap.items[0],'foo')
         self.assertEqual(rangeMap.items[1], 'bar')
-        self.assertEqual(rangeMap.items[2],'foo')        
+        self.assertEqual(rangeMap.items[2],'foo')
+    def test_get(self):
+        if debug: print("Testing get")
+        rangeMap = RangeMap()
+        rangeMap.put(Range.closed(1,10),'foo')
+        rangeMap.put(Range.open(3,6), 'bar')
+        rangeMap.put(Range.open(10,20), 'foo')
+        self.assertEqual(rangeMap.get(1),set(['foo']))
+        self.assertEquals(rangeMap.get(4),set(['bar']))
+        with self.assertRaises(KeyError):
+            rangeMap.get(20)
+        self.assertEqual(rangeMap.get(Range.closed(11,15)),set(['foo']))
+        self.assertEquals(rangeMap.get(Range.closed(5,15)),set(['foo','bar']))
+        with self.assertRaises(KeyError):
+            rangeMap.get(Range.closed(20,30))
+        self.assertEquals(rangeMap.get(Range.closed(15,100)),set(['foo']))
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)
