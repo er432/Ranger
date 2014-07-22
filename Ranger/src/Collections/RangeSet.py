@@ -28,6 +28,8 @@ class RangeSet(object):
         return "RangeSet(%s)" % ", ".join(map(str, self.ranges))
     def __len__(self):
         return len(self.ranges)
+    def __iter__(self):
+        return iter(self.ranges)
     def __eq__(self, other):
         if not isinstance(other, RangeSet):
             return False

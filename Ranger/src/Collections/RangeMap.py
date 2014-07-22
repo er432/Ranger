@@ -33,6 +33,8 @@ class RangeMap(object):
         self.put(key, value)
     def __delitem__(self, key):
         self.remove(key)
+    def __iter__(self):
+        return iter(self.ranges)
     def __eq__(self, other):
         if not isinstance(other, RangeMap): return False
         elif len(self) != len(other): return False
