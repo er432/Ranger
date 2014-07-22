@@ -67,6 +67,8 @@ class RangeSetTest(unittest.TestCase):
         theSet.add(Range.closed(3,5))
         theSet.add(Range.closed(7,10))
         self.assertTrue(theSet.overlaps(4))
+        self.assertFalse(theSet.overlaps(Range.closedOpen(1,3)))
+        self.assertFalse(theSet.overlaps(Range.open(5,7)))
         self.assertFalse(theSet.overlaps(2))
         self.assertTrue(theSet.overlaps(3))
         self.assertTrue(theSet.overlaps(10))

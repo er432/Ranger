@@ -9,7 +9,8 @@ sys.path.pop(0)
 version = release.write_versionfile()
 packages = ['Ranger',
             'Ranger.src',
-            'Ranger.src.Range'
+            'Ranger.src.Range',
+            'Ranger.src.Collections'
            ]
 setup(
     name = release.name.lower(),

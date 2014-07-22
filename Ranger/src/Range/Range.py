@@ -220,6 +220,7 @@ class Range(object):
             [2,4] and [5,7] are not connected
             [2,4] and [3,5] are connected
             [2,4] and [4,6] are connected
+            [3,5] and (5,10) are connected
         
         Parameters
         ----------
