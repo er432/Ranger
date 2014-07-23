@@ -6,10 +6,13 @@
 Welcome to Ranger's documentation!
 ==================================
 
-Contents:
+.. only:: html
+
+   :Release: |version|
+   :Date: |today|
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    Ranger
 
