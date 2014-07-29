@@ -80,6 +80,24 @@ class RangeBucketMapTest(unittest.TestCase):
         self.assertEqual(buckets.items[1], set(['a','c']))
         self.assertEqual(buckets.items[2], set(['b','c']))
         self.assertEqual(buckets.items[3], set(['b']))
+    def test_iteritems(self):
+        if debug: print("Testing iteritems")
+        buckets = RangeBucketMap()
+        buckets.put(Range.closed(3,5),'a')
+        buckets.put(Range.closed(7,10),'b')
+        buckets.put(Range.closed(4,8),'c')
+        iterator = buckets.iteritems(2,10)
+        self.assertEquals(next(iterator), (Range.closed(3,5), 'a'))
+        self.assertEquals(next(iterator), (Range.closed(4,8), 'c'))
+        self.assertEquals(next(iterator), (Range.closed(7,10), 'b'))
+        with self.assertRaises(StopIteration):
+            next(iterator)
+        iterator = buckets.iteritems(3,8)
+        self.assertEquals(next(iterator), (Range.closed(3,5), 'a'))
+        self.assertEquals(next(iterator), (Range.closed(4,8), 'c'))
+        self.assertEquals(next(iterator), (Range.closed(7,8), 'b'))
+        with self.assertRaises(StopIteration):
+            next(iterator)        
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)

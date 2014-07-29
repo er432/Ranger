@@ -2,6 +2,7 @@ from bisect import bisect_left
 from collections import deque, Hashable
 from Ranger.src.Collections.RangeMap import RangeMap
 from Ranger.src.Range.Range import Range
+from Ranger.src.Range.Cut import Cut
 
 class RangeBucketMap(RangeMap):
     """ Class used to represent a mapping of disjoint ranges to sets of items. Ranges
@@ -18,13 +19,78 @@ class RangeBucketMap(RangeMap):
         """
         self.recurseAdd = False
         super(RangeBucketMap, self).__init__(rangeDict)
+    def iteritems(self, start = None, end = None):
+        """ Iterates over pairs of (Range, value)
+
+        Parameters
+        ----------
+        start : comparable, optional
+            The starting point for iterating, inclusive
+        end : comparable, optional
+            The ending point for iterating, inclusive
+
+        Returns
+        -------
+        Generator of (Range intersecting [start,end], value), ordered by start point
+        """
+        if start is None:
+            start = self.lower_cuts[0]
+        else:
+            start = Cut.belowValue(start)
+        if end is None:
+            end = self.upper_cuts[-1]
+        else:
+            end = Cut.aboveValue(end)
+        bounding_range = Range(start, end)
+        # Get the bounding indices
+        ovlapLowerInd = max(bisect_left(self.lower_cuts, start)-1,0)
+        ovlapUpperInd = bisect_left(self.lower_cuts, end)
+        # Create queue of values that need to be generated
+        yield_vals = deque()
+        # Create dictionary of values to be generated -> indices containing them
+        vals_inds_dict = {}
+        for i in range(ovlapLowerInd, ovlapUpperInd):
+            # Check if anything can be released from the queue
+            while len(yield_vals) > 0:
+                if vals_inds_dict[yield_vals[0]][-1] < i-1:
+                    # Yield the full range, value. Remove value from queue
+                    val = yield_vals.popleft()
+                    yield Range(max(self.lower_cuts[vals_inds_dict[val][0]],start),
+                                min(self.upper_cuts[vals_inds_dict[val][-1]],end)), val
+                    # Remove value from dict
+                    del vals_inds_dict[val]
+                else:
+                    break
+            try:
+                # Get intersection of the ranges
+                intersect = bounding_range.intersection(self.ranges[i])
+                if not intersect.isEmpty():
+                    # If overlapping with this range, put into queue
+                    for val in self.items[i]:
+                        if val not in vals_inds_dict:
+                            yield_vals.append(val)
+                            vals_inds_dict[val] = deque()
+                        vals_inds_dict[val].append(i)
+            except ValueError:
+                # Continue if no overlap with this range
+                continue
+        ## Yield remaining values
+        while len(yield_vals) > 0:
+            # Yield the full range, value. Remove value from queue
+            val = yield_vals.popleft()
+            yield Range(max(self.lower_cuts[vals_inds_dict[val][0]],start),
+                        min(self.upper_cuts[vals_inds_dict[val][-1]],end)), val
+            # Remove value from dict
+            del vals_inds_dict[val]
+                
     def get(self, key):
         """ Get the item(s) corresponding to a given key. The key can be a
         Range or a single value that is within a Range
 
         Parameters
         ----------
-        key : A single value or Range object
+        key : comparable
+            A single value or Range object
 
         Raises
         ------
