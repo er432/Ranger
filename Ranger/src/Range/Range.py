@@ -28,13 +28,19 @@ class Range(object):
         self.lowerCut = lowerCut
         self.upperCut = upperCut
     def __repr__(self):
-        return_str = '[' if self.isLowerBoundClosed() else '('
+        try:
+            return_str = '[' if self.isLowerBoundClosed() else '('
+        except TypeError:
+            return_str = '('
         return_str += (str(self.lowerCut.point) if not self.lowerCut.belowAll \
           else '')
         return_str += ' , '
         return_str += (str(self.upperCut.point) if not self.upperCut.aboveAll \
           else '')
-        return_str += ']' if self.isUpperBoundClosed() else ')'
+        try:
+            return_str += ']' if self.isUpperBoundClosed() else ')'
+        except TypeError:
+            return_str += ')'
         return return_str
     def __hash__(self):
         return (hash(self.lowerCut)*31 + hash(self.upperCut))

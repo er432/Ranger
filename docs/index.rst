@@ -11,6 +11,7 @@ Welcome to Ranger's documentation!
 .. toctree::
    :maxdepth: 1
 
+   tutorial/index
    Ranger
 
 Overview
