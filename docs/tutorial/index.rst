@@ -7,3 +7,4 @@ Ranger Tutorial
    :maxdepth: 2
 
    ranges
+   collections

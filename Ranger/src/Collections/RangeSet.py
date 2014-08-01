@@ -242,6 +242,7 @@ class RangeSet(object):
                                                  intersect.lowerCut))
                                 newLowerCut = intersect.upperCut
                                 newUpperCut = addRange.upperCut
+                                addRange = Range(newLowerCut, newUpperCut)
                     except ValueError:
                         continue
                 if add:
