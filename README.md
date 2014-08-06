@@ -1,4 +1,8 @@
-Ranger
+**Ranger**
+
+Installation
+^^^^^^^^^^^^
+pip install -U ranger
 
 Ranger is a Python package for the manipulation of range objects. 
 Ranges may extend over discrete or continuous domains, be open or closed,
