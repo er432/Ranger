@@ -234,6 +234,28 @@ class RangeTest(unittest.TestCase):
         range2 = Range.closed(2.,5.)
         self.assertEqual(range1.span(range2),
                          Range.closed(1.,5.))
+    def test_getDistanceFromPoint(self):
+        if debug: print("Testing getDistanceFromPoint")
+        range1 = Range.closed(1.,3.)
+        self.assertAlmostEqual(range1.getDistanceFromPoint(1.),0.)
+        self.assertAlmostEqual(range1.getDistanceFromPoint(2.),0.)
+        self.assertAlmostEqual(range1.getDistanceFromPoint(3.),0.)
+        self.assertAlmostEqual(range1.getDistanceFromPoint(100.),97.)
+        self.assertAlmostEqual(range1.getDistanceFromPoint(0.99),0.01)
+        range1 = Range.openClosed(1.,3.)
+        with self.assertRaises(TypeError):
+            range1.getDistanceFromPoint(0.99)
+    def test_getDistanceFromRange(self):
+        if debug: print("Testing getDistanceFromRange")
+        range1 = Range.closed(1.,3.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(5.,7.)),2.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(-1.,0.)),1.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(-5.,10.)),0.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(-5.,2.)),0.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(2.,10.)),0.)
+        self.assertAlmostEqual(range1.getDistanceFromRange(Range.closed(1.5,2.1)),0.)
+        with self.assertRaises(TypeError):
+            range1.getDistanceFromRange(Range.closedOpen(1.5,2.1))
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)

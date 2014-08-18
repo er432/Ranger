@@ -1,9 +1,5 @@
-from Ranger import release
-
-__author__ = '%s <%s>\n' % release.authors['Rodgers-Melnick']
-__license__ = release.license
-__date__ = release.date
-__version__ = release.version
+__author__ = 'Eli Rodgers-Melnick'
+__license__ = 'BSD'
 
 # Make imports
 from Ranger.src.Range.Range import Range

@@ -93,6 +93,73 @@ class Range(object):
             if not self.contains(val):
                 return False
         return True
+    def getDistanceFromPoint(self, val, distFunc = lambda x1, x2: abs(x1-x2)):
+        """ Returns the minimum distance of a Range from a Point, returning 0
+        if there is an overlap.
+
+        Note that both upper and lower bounds must be closed for this function
+        to work
+
+        Parameters
+        ----------
+        val : comparable, compatible with cutpoint type
+            The value of the point where the distance is desired
+        distFunc : callable
+            Function that calculates the distance between two points in the
+            domain of the Range
+
+        Raises
+        ------
+        TypeError
+            If the upper and/or lower bounds of this Range are not closed
+            or if the distFunc not compatible with the type
+        
+        Returns
+        -------
+        The minimum distance between the Range and the Point. Returns 0
+        if there is an overlap
+        """
+        if not all((self.isLowerBoundClosed(), self.isUpperBoundClosed())):
+            raise TypeError("Range is not closed")
+        if self.contains(val):
+            return 0.
+        else:
+            return min(distFunc(self.lowerCut.point, val),
+                       distFunc(self.upperCut.point, val))
+    def getDistanceFromRange(self, other, distFunc = lambda x1,x2: abs(x1-x2)):
+        """ Returns the minimum distance of a Range from another Range, returning
+        0 if there is any overlap
+
+        Note that both Ranges must be closed for this function to work
+
+        Parameters
+        ----------
+        other : Range, compatible with this Range's domain
+            The Range to compare to
+        distFunc : callable
+            Function that calculates the distance between two points in the
+            domain of the Range
+
+        Raises
+        ------
+        TypeError
+            If the upper and/or lower bounds of this Range are not closed
+            or if the distFunc not compatible with the type
+
+        Returns
+        -------
+        Minimum distance between the ranges        
+        """
+        if not isinstance(other, Range):
+            raise TypeError("other is not a Range")
+        if not all((self.isLowerBoundClosed(), self.isUpperBoundClosed(),
+                    other.isLowerBoundClosed(), other.isUpperBoundClosed())):
+            raise TypeError("Not all Ranges closed")
+        if self.isConnected(other):
+            return 0.
+        else:
+            return min(distFunc(self.lowerCut.point, other.upperCut.point),
+                       distFunc(other.lowerCut.point, self.upperCut.point))
     def hasLowerBound(self):
         """ Returns True if the range has a lower endpoint (not unbounded
         at the lower end)
