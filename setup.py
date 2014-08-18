@@ -14,7 +14,7 @@ packages = ['Ranger',
            ]
 setup(
     name = 'ranger',
-    version = '0.3',
+    version = '0.4',
     packages=packages,
     author = 'Eli Rodgers-Melnick',
     author_email = 'er432@cornell.edu',

@@ -1,4 +1,3 @@
-__author__ = "Eli Rodgers-Melnick"
 
 class Cut(object):
     """
