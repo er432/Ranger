@@ -40,6 +40,14 @@ class RangeBucketMapTest(unittest.TestCase):
         self.assertEqual(buckets.get(4),set(['a','c']))
         self.assertEquals(buckets.get(Range.closed(0,20)),set(['a','b','c']))
         self.assertEquals(buckets.get(Range.openClosed(5,8)),set(['b','c']))
+    def test_get_bugfix1(self):
+        if debug: print("Testing get under first bugfix")
+        buckets = RangeBucketMap()
+        buckets.put(Range.closed(67432367,67434244),'G')
+        buckets.put(Range.closed(67432367,67434244),'T1')
+        buckets.put(Range.closed(67432375,67434015),'T2')
+        buckets_dict = dict((v,k) for k,v in buckets.iteritems())
+        self.assertEqual(buckets_dict['T2'], Range.closed(67432375,67434015))
     def test_remove(self):
         if debug: print("Testing remove")
         buckets = RangeBucketMap()
