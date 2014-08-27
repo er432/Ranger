@@ -1,5 +1,7 @@
 **Ranger**
 
+Documentation: https://pythonhosted.org/ranger
+
 Installation
 
 pip install -U ranger

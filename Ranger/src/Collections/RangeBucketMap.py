@@ -223,10 +223,10 @@ class RangeBucketMap(RangeMap):
                             # If entire key enclosed by existing Range
                             # Add in lower part of original Range
                             addRanges.append(Range(self.lower_cuts[i], intersect.lowerCut))
-                            addItems.append(self.items[i])
+                            addItems.append(set(self.items[i]))
                             # Add in upper part of original Range
                             addRanges.append(Range(intersect.upperCut, self.upper_cuts[i]))
-                            addItems.append(self.items[i])
+                            addItems.append(set(self.items[i]))
                             # Define original part to be middle
                             self.lower_cuts[i] = intersect.lowerCut
                             self.upper_cuts[i] = intersect.upperCut
@@ -316,10 +316,10 @@ class RangeBucketMap(RangeMap):
                             # into the remove queue
                             addRanges.append(Range(self.lower_cuts[i],
                                                    intersect.lowerCut))
-                            addItems.append(self.items[i])
+                            addItems.append(set(self.items[i]))
                             addRanges.append(Range(intersect.upperCut,
                                                    self.upper_cuts[i]))
-                            addItems.append(self.items[i])
+                            addItems.append(set(self.items[i]))
                             removeRanges.append(i)
                 except ValueError:
                     # Continue if no overlap with this range
