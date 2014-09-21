@@ -25,7 +25,11 @@ class RangeSet(object):
             for aRange in ranges:
                 self.add(aRange)
     def __repr__(self):
-        return "RangeSet(%s)" % ", ".join(map(str, self.ranges))
+        if len(self) < 6:
+            return "RangeSet(%s)" % ", ".join(map(str, self.ranges))
+        else:
+            return "RangeSet(%s, ..., %s)" % (", ".join(map(str, self.ranges[:2])),
+                                              ", ".join(map(str, self.ranges[-2:])))
     def __len__(self):
         return len(self.ranges)
     def __iter__(self):

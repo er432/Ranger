@@ -48,9 +48,17 @@ class RangeMap(object):
     def __len__(self):
         return len(self.ranges)
     def __repr__(self):
-        returnStr = "{%s}" % ", ".join([
-            "%s : %s" % (k,v) for k,v in zip(self.ranges, self.items)
+        if len(self) < 5:
+            returnStr = "{%s}" % ", ".join([
+                "%s : %s" % (k,v) for k,v in zip(self.ranges, self.items)
+                ])
+        else:
+            returnStr = "{%s, ..., %s}" % (", ".join([
+                "%s : %s" % (k,v) for k,v in zip(self.ranges[:2], self.items[:2])
+            ]), ", ".join([
+                "%s : %s" % (k,v) for k,v in zip(self.ranges[-2:], self.items[-2:])
             ])
+                                           )
         return returnStr
     def __missing__(self, key):
         raise KeyError(str(key))
