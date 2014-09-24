@@ -235,14 +235,16 @@ class RangeSet(object):
                                 # If equal on the left cutpoint, subtract out left
                                 # part
                                 newLowerCut = intersect.upperCut
+                                addRange = Range(newLowerCut, newUpperCut)
                             elif addRange.upperCut == intersect.upperCut:
                                 # If equal on right cutpoint, subtract out right
                                 # part
                                 newUpperCut = intersect.lowerCut
+                                addRange = Range(addRange.lowerCut, newUpperCut)
                             else:
                                 # If in the middle, split into two parts and
                                 # add the lower one immediately
-                                newSet.add(Range(addRange.lowerCut,
+                                newSet.add(Range(newLowerCut,
                                                  intersect.lowerCut))
                                 newLowerCut = intersect.upperCut
                                 newUpperCut = addRange.upperCut

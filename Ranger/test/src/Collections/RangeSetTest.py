@@ -105,6 +105,24 @@ class RangeSetTest(unittest.TestCase):
                                    Range.openClosed(9,10)]))
         diffSet = startSet.difference(RangeSet([Range.closed(1,11)]))
         self.assertEqual(len(diffSet),0)
+    def test_difference_bug1(self):
+        if debug: print("Testing difference with reference to bug 1")
+        set1 = RangeSet([Range.closedOpen(2949490, 2949550),
+                         Range.closedOpen(2950080, 2950130),
+                         Range.closedOpen(2993110, 2993150)])
+        set2 = RangeSet([
+            Range.closedOpen(2949640, 2949660),
+            Range.closedOpen(2950070, 2950090),
+            Range.closedOpen(2950110, 2950120)
+        ])
+        diff = set1.difference(set2)
+        self.assertEqual(diff, RangeSet([
+            Range.closedOpen(2949490, 2949550),
+            Range.closedOpen(2950090, 2950110),
+            Range.closedOpen(2950120, 2950130),
+            Range.closedOpen(2993110, 2993150)
+        ]))
+                                        
     def test_intersection(self):
         if debug: print("Testing intersection")
         startSet = RangeSet([Range.closed(3,5),Range.closed(7,10)])
