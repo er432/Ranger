@@ -428,3 +428,38 @@ class RangeSet(object):
         if not isinstance(otherSet, RangeSet):
             raise TypeError("otherSet is not a RangeSet")
         return RangeSet(set(self.ranges+otherSet.ranges))
+    def whichOverlaps(self, val):
+        """ Returns which of the Ranges overlap with a single value or
+        Range object
+
+        Parameters
+        ----------
+        val : A single value or a Range object
+
+        Raises:
+        -------
+        ValueError
+            If the value type not compatible with the ranges
+
+        Returns
+        -------
+        set of ranges overlapping with the value
+        """
+        if len(self) == 0: return False
+        # Get the index+1 of the highest lower cut <= to the value or its
+        # lower cutpoint and check if the value overlaps. If it does, add
+        # to set
+        overlap_set = set()
+        if isinstance(val, Range):
+            lower_ind = bisect_left(self.lower_cuts, val.lowerCut)-1
+            upper_ind = bisect_left(self.lower_cuts, val.upperCut)
+            for i in range(lower_ind,upper_ind):
+                if val.isConnected(self.ranges[i]):
+                    if not self.ranges[i].intersection(val).isEmpty():
+                        overlap_set.add(self.ranges[i])
+            return overlap_set
+        else:
+            lower_ind = bisect_left(self.lower_cuts,val)-1
+            if self.ranges[lower_ind].contains(val):
+                overlap_set.add(self.ranges[lower_ind])
+            return overlap_set

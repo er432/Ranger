@@ -170,6 +170,26 @@ class RangeSetTest(unittest.TestCase):
         self.assertEqual(startSet, RangeSet([
             Range.open(3,5)
         ]))
+    def test_whichOverlaps(self):
+        if debug: print("Testing whichOverlaps")
+        theSet = RangeSet()
+        theSet.add(Range.closed(3,5))
+        theSet.add(Range.closed(7,10))
+        self.assertEqual(theSet.whichOverlaps(4), set([Range.closed(3,5)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(0,4)),
+                         set([Range.closed(3,5)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(4,5)),
+                         set([Range.closed(3,5)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(4,6)),
+                         set([Range.closed(3,5)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(6,7)),
+                         set([Range.closed(7,10)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(8,11)),
+                         set([Range.closed(7,10)]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(12,15)),
+                         set([]))
+        self.assertEqual(theSet.whichOverlaps(Range.closed(4,11)),
+                         set([Range.closed(3,5), Range.closed(7,10)]))
 if __name__ == "__main__":
     debug = True
     unittest.main(exit = False)
