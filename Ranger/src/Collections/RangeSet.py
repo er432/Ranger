@@ -184,8 +184,13 @@ class RangeSet(object):
         # Get the index+1 of the highest lower cut <= to the value or its
         # lower cutpoint and check if the value contained
         if isinstance(val, Range):
-            lower_ind = max(bisect_left(self.lower_cuts, val.lowerCut)-1,0)
-            return self.ranges[lower_ind].encloses(val)
+            lower_ind = max(bisect_left(self.lower_cuts, val.lowerCut),0)
+            if lower_ind >= len(self.lower_cuts):
+                return self.ranges[lower_ind-1].encloses(val)
+            elif val.lowerCut != self.lower_cuts[lower_ind]:
+                return self.ranges[lower_ind-1].encloses(val)
+            else:
+                return self.ranges[lower_ind].encloses(val)
         else:
             lower_ind = max(bisect_left(self.lower_cuts, val)-1,0)
             return self.ranges[lower_ind].contains(val)
